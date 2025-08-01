@@ -1,0 +1,53 @@
+{
+  "_comment": "Error Collector MCP Configuration",
+  "_description": "This configuration file controls how the Error Collector MCP server operates",
+  
+  "openrouter": {
+    "_comment": "OpenRouter API configuration for AI summarization",
+    "api_key": "your-openrouter-api-key-here",
+    "base_url": "https://openrouter.ai/api/v1",
+    "model": "meta-llama/llama-3.1-8b-instruct:free",
+    "max_tokens": 1000,
+    "temperature": 0.7,
+    "timeout": 30,
+    "max_retries": 3
+  },
+  
+  "collection": {
+    "_comment": "Error collection preferences and filtering",
+    "enabled_sources": ["browser", "terminal"],
+    "ignored_error_patterns": [
+      "ResizeObserver loop limit exceeded",
+      "Non-Error promise rejection captured",
+      "Script error\\.",
+      "Network request failed.*chrome-extension"
+    ],
+    "ignored_domains": [
+      "chrome-extension://",
+      "moz-extension://",
+      "safari-extension://",
+      "localhost:3000"
+    ],
+    "max_errors_per_minute": 100,
+    "auto_summarize": true,
+    "group_similar_errors": true,
+    "similarity_threshold": 0.8
+  },
+  
+  "storage": {
+    "_comment": "Data storage configuration",
+    "data_directory": "~/.error-collector-mcp",
+    "max_errors_stored": 10000,
+    "retention_days": 30,
+    "backup_enabled": true
+  },
+  
+  "server": {
+    "_comment": "MCP server configuration",
+    "host": "localhost",
+    "port": 8000,
+    "log_level": "INFO",
+    "enable_cors": true,
+    "max_concurrent_requests": 10
+  }
+}

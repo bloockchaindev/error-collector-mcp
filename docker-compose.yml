@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  error-collector-mcp:
+    build: .
+    container_name: error-collector-mcp
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - error_data:/data
+    environment:
+      - ERROR_COLLECTOR_STORAGE__DATA_DIRECTORY=/data
+      - ERROR_COLLECTOR_SERVER__HOST=0.0.0.0
+      - ERROR_COLLECTOR_SERVER__PORT=8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  error_data:
+    driver: local
