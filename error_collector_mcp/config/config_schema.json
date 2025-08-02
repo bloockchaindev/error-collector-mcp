@@ -1,0 +1,251 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/error-collector-mcp-config.schema.json",
+  "definitions": {
+    "CollectionPreferences": {
+      "description": "Error collection preferences and filtering.",
+      "properties": {
+        "_comment": {
+          "type": "string",
+          "description": "Section comment"
+        },
+        "enabled_sources": {
+          "default": [
+            "terminal",
+            "browser"
+          ],
+          "description": "Enabled error sources",
+          "items": {
+            "type": "string"
+          },
+          "title": "Enabled Sources",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "ignored_error_patterns": {
+          "default": [],
+          "description": "Regex patterns for errors to ignore",
+          "items": {
+            "type": "string"
+          },
+          "title": "Ignored Error Patterns",
+          "type": "array"
+        },
+        "ignored_domains": {
+          "default": [],
+          "description": "Browser domains to ignore",
+          "items": {
+            "type": "string"
+          },
+          "title": "Ignored Domains",
+          "type": "array"
+        },
+        "max_errors_per_minute": {
+          "default": 100,
+          "description": "Maximum errors to collect per minute",
+          "title": "Max Errors Per Minute",
+          "type": "integer"
+        },
+        "auto_summarize": {
+          "default": true,
+          "description": "Automatically summarize new errors",
+          "title": "Auto Summarize",
+          "type": "boolean"
+        },
+        "group_similar_errors": {
+          "default": true,
+          "description": "Group similar errors together",
+          "title": "Group Similar Errors",
+          "type": "boolean"
+        },
+        "similarity_threshold": {
+          "default": 0.8,
+          "description": "Threshold for grouping similar errors",
+          "title": "Similarity Threshold",
+          "type": "number"
+        }
+      },
+      "title": "CollectionPreferences",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "LogLevel": {
+      "description": "Logging levels.",
+      "enum": [
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR",
+        "CRITICAL"
+      ],
+      "title": "LogLevel",
+      "type": "string"
+    },
+    "OpenRouterConfig": {
+      "description": "OpenRouter API configuration.",
+      "properties": {
+        "_comment": {
+          "type": "string",
+          "description": "Section comment"
+        },
+        "api_key": {
+          "description": "OpenRouter API key",
+          "title": "Api Key",
+          "type": "string"
+        },
+        "base_url": {
+          "default": "https://openrouter.ai/api/v1",
+          "description": "OpenRouter API base URL",
+          "title": "Base Url",
+          "type": "string"
+        },
+        "model": {
+          "default": "meta-llama/llama-3.1-8b-instruct:free",
+          "description": "Model to use for summarization",
+          "title": "Model",
+          "type": "string"
+        },
+        "max_tokens": {
+          "default": 1000,
+          "description": "Maximum tokens for responses",
+          "title": "Max Tokens",
+          "type": "integer"
+        },
+        "temperature": {
+          "default": 0.7,
+          "description": "Temperature for generation",
+          "title": "Temperature",
+          "type": "number"
+        },
+        "timeout": {
+          "default": 30,
+          "description": "Request timeout in seconds",
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "max_retries": {
+          "default": 3,
+          "description": "Maximum retry attempts",
+          "title": "Max Retries",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "api_key"
+      ],
+      "title": "OpenRouterConfig",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "ServerConfig": {
+      "description": "MCP server configuration.",
+      "properties": {
+        "_comment": {
+          "type": "string",
+          "description": "Section comment"
+        },
+        "host": {
+          "default": "localhost",
+          "description": "Server host",
+          "title": "Host",
+          "type": "string"
+        },
+        "port": {
+          "default": 8000,
+          "description": "Server port",
+          "title": "Port",
+          "type": "integer"
+        },
+        "log_level": {
+          "$ref": "#/definitions/LogLevel",
+          "default": "INFO",
+          "description": "Logging level"
+        },
+        "enable_cors": {
+          "default": true,
+          "description": "Enable CORS",
+          "title": "Enable Cors",
+          "type": "boolean"
+        },
+        "max_concurrent_requests": {
+          "default": 10,
+          "description": "Maximum concurrent requests",
+          "title": "Max Concurrent Requests",
+          "type": "integer"
+        }
+      },
+      "title": "ServerConfig",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "StorageConfig": {
+      "description": "Storage configuration.",
+      "properties": {
+        "_comment": {
+          "type": "string",
+          "description": "Section comment"
+        },
+        "data_directory": {
+          "default": "~/.error-collector-mcp",
+          "description": "Directory for storing error data",
+          "title": "Data Directory",
+          "type": "string"
+        },
+        "max_errors_stored": {
+          "default": 10000,
+          "description": "Maximum number of errors to store",
+          "title": "Max Errors Stored",
+          "type": "integer"
+        },
+        "retention_days": {
+          "default": 30,
+          "description": "Days to retain error data",
+          "title": "Retention Days",
+          "type": "integer"
+        },
+        "backup_enabled": {
+          "default": true,
+          "description": "Enable automatic backups",
+          "title": "Backup Enabled",
+          "type": "boolean"
+        }
+      },
+      "title": "StorageConfig",
+      "type": "object",
+      "additionalProperties": false
+    }
+  },
+  "description": "Main configuration model.",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "_comment": {
+      "type": "string",
+      "description": "Configuration comment"
+    },
+    "_description": {
+      "type": "string",
+      "description": "Configuration description"
+    },
+    "openrouter": {
+      "$ref": "#/definitions/OpenRouterConfig"
+    },
+    "collection": {
+      "$ref": "#/definitions/CollectionPreferences"
+    },
+    "storage": {
+      "$ref": "#/definitions/StorageConfig"
+    },
+    "server": {
+      "$ref": "#/definitions/ServerConfig"
+    }
+  },
+  "required": [
+    "openrouter"
+  ],
+  "title": "Config",
+  "type": "object",
+  "additionalProperties": false
+}

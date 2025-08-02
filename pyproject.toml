@@ -4,13 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "error-collector-mcp"
-version = "0.1.0"
-description = "A Model Context Protocol server for intelligent error collection and summarization"
+version = "1.0.0"
+description = "Production-ready Model Context Protocol server for intelligent error collection, analysis, and AI-powered summarization"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "Error Collector MCP Contributors"}
+    {name = "Error Collector MCP Contributors", email = "contributors@error-collector-mcp.org"}
 ]
+maintainers = [
+    {name = "Error Collector MCP Team", email = "maintainers@error-collector-mcp.org"}
+]
+keywords = ["mcp", "error-collection", "ai", "debugging", "development-tools", "openrouter"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -45,14 +49,20 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/error-collector-mcp"
-Repository = "https://github.com/yourusername/error-collector-mcp"
-Issues = "https://github.com/yourusername/error-collector-mcp/issues"
-Documentation = "https://github.com/yourusername/error-collector-mcp#readme"
-Changelog = "https://github.com/yourusername/error-collector-mcp/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/error-collector-mcp/error-collector-mcp"
+Repository = "https://github.com/error-collector-mcp/error-collector-mcp"
+Issues = "https://github.com/error-collector-mcp/error-collector-mcp/issues"
+Documentation = "https://error-collector-mcp.readthedocs.io/"
+Changelog = "https://github.com/error-collector-mcp/error-collector-mcp/blob/main/CHANGELOG.md"
+"Bug Reports" = "https://github.com/error-collector-mcp/error-collector-mcp/issues"
+"Feature Requests" = "https://github.com/error-collector-mcp/error-collector-mcp/discussions"
+"Security" = "https://github.com/error-collector-mcp/error-collector-mcp/security/policy"
 
 [project.scripts]
-error-collector-mcp = "error_collector_mcp.main:main"
+error-collector-mcp = "error_collector_mcp.main:cli_main"
+
+[project.entry-points."mcp.servers"]
+error-collector = "error_collector_mcp.server:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

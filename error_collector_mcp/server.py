@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 from fastmcp import FastMCP
-from fastmcp.server import Server
 
 from .services import ErrorCollectorMCPService
 from .mcp_tools import ErrorQueryTool, ErrorSummaryTool, ErrorStatisticsTool
@@ -67,6 +66,11 @@ async def query_errors(
     group_similar: bool = False
 ) -> Dict[str, Any]:
     """Query and filter collected errors."""
+    global service
+    if not service:
+        # Initialize service lazily
+        await startup()
+    
     if not service:
         return {"success": False, "error": "Service not initialized"}
     
@@ -101,6 +105,10 @@ async def get_error_summary(
     enhance_solutions: bool = False
 ) -> Dict[str, Any]:
     """Get AI-generated error summaries and analysis."""
+    global service
+    if not service:
+        await startup()
+    
     if not service:
         return {"success": False, "error": "Service not initialized"}
     
@@ -132,6 +140,10 @@ async def get_error_statistics(
     include_recommendations: bool = True
 ) -> Dict[str, Any]:
     """Get comprehensive error statistics and analytics."""
+    global service
+    if not service:
+        await startup()
+    
     if not service:
         return {"success": False, "error": "Service not initialized"}
     
@@ -155,6 +167,10 @@ async def get_error_statistics(
 async def get_server_status(include_details: bool = True) -> Dict[str, Any]:
     """Get server status and health information."""
     try:
+        global service
+        if not service:
+            await startup()
+        
         if not service:
             return {
                 "success": False,
@@ -318,8 +334,7 @@ async def cleanup_old_data(retention_days: Optional[int] = None) -> Dict[str, An
         }
 
 
-# Server startup and shutdown handlers
-@app.on_startup
+# Initialize service on startup
 async def startup():
     """Server startup handler."""
     logger.info("Error Collector MCP server starting up...")
@@ -338,7 +353,6 @@ async def startup():
     await initialize_service(config_path, data_directory)
 
 
-@app.on_shutdown
 async def shutdown():
     """Server shutdown handler."""
     logger.info("Error Collector MCP server shutting down...")

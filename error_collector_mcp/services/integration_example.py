@@ -63,6 +63,9 @@ class ErrorCollectorMCPService:
             # Initialize AI summarizer
             self.ai_summarizer = AISummarizer(config.openrouter)
             
+            # Initialize summary store (CRITICAL: Load existing summaries)
+            await self.summary_store.initialize()
+            
             # Initialize error manager
             self.error_manager = ErrorManager(
                 config_service=self.config_service,

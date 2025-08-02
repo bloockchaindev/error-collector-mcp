@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import logging
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -73,8 +74,64 @@ class ConfigService:
     
     def _apply_env_overrides(self, config_data: Dict[str, Any]) -> Dict[str, Any]:
         """Apply environment variable overrides to configuration."""
+        # Load .env file if it exists
+        self._load_env_file()
+        
+        # First, substitute ${VARIABLE} syntax in the config
+        config_data = self._substitute_env_variables(config_data)
+        
+        # Then apply direct environment variable overrides
+        config_data = self._apply_direct_env_overrides(config_data)
+        
+        return config_data
+    
+    def _load_env_file(self) -> None:
+        """Load environment variables from .env file if it exists."""
+        env_file = Path('.env')
+        if env_file.exists():
+            try:
+                with open(env_file, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#') and '=' in line:
+                            key, value = line.split('=', 1)
+                            key = key.strip()
+                            value = value.strip().strip('"').strip("'")
+                            if key and not os.getenv(key):  # Don't override existing env vars
+                                os.environ[key] = value
+                logger.debug("Environment variables loaded from .env file")
+            except Exception as e:
+                logger.warning(f"Failed to load .env file: {e}")
+    
+    def _substitute_env_variables(self, data: Any) -> Any:
+        """Recursively substitute ${VARIABLE} patterns with environment variables."""
+        if isinstance(data, dict):
+            return {key: self._substitute_env_variables(value) for key, value in data.items()}
+        elif isinstance(data, list):
+            return [self._substitute_env_variables(item) for item in data]
+        elif isinstance(data, str):
+            # Replace ${VARIABLE} or ${VARIABLE:-default} patterns
+            def replace_var(match):
+                var_expr = match.group(1)
+                if ':-' in var_expr:
+                    var_name, default_value = var_expr.split(':-', 1)
+                    return os.getenv(var_name.strip(), default_value.strip())
+                else:
+                    var_name = var_expr.strip()
+                    env_value = os.getenv(var_name)
+                    if env_value is None:
+                        logger.warning(f"Environment variable {var_name} not found, keeping original value")
+                        return match.group(0)  # Return original ${VAR} if not found
+                    return env_value
+            
+            return re.sub(r'\$\{([^}]+)\}', replace_var, data)
+        else:
+            return data
+    
+    def _apply_direct_env_overrides(self, config_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply direct environment variable overrides using ERROR_COLLECTOR_ prefix."""
         # OpenRouter API key override
-        api_key_env = os.getenv('ERROR_COLLECTOR_OPENROUTER__API_KEY')
+        api_key_env = os.getenv('ERROR_COLLECTOR_OPENROUTER__API_KEY') or os.getenv('OPENROUTER_API_KEY')
         if api_key_env:
             if 'openrouter' not in config_data:
                 config_data['openrouter'] = {}
@@ -90,12 +147,31 @@ class ConfigService:
             logger.debug(f"Log level overridden from environment: {log_level_env}")
         
         # Data directory override
-        data_dir_env = os.getenv('ERROR_COLLECTOR_STORAGE__DATA_DIRECTORY')
+        data_dir_env = os.getenv('ERROR_COLLECTOR_STORAGE__DATA_DIRECTORY') or os.getenv('ERROR_COLLECTOR_DATA_DIR')
         if data_dir_env:
             if 'storage' not in config_data:
                 config_data['storage'] = {}
             config_data['storage']['data_directory'] = data_dir_env
             logger.debug(f"Data directory overridden from environment: {data_dir_env}")
+        
+        # Server host override
+        host_env = os.getenv('ERROR_COLLECTOR_SERVER__HOST')
+        if host_env:
+            if 'server' not in config_data:
+                config_data['server'] = {}
+            config_data['server']['host'] = host_env
+            logger.debug(f"Server host overridden from environment: {host_env}")
+        
+        # Server port override
+        port_env = os.getenv('ERROR_COLLECTOR_SERVER__PORT')
+        if port_env:
+            if 'server' not in config_data:
+                config_data['server'] = {}
+            try:
+                config_data['server']['port'] = int(port_env)
+                logger.debug(f"Server port overridden from environment: {port_env}")
+            except ValueError:
+                logger.warning(f"Invalid port value in environment: {port_env}")
         
         return config_data
     

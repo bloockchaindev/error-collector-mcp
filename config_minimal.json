@@ -1,0 +1,6 @@
+{
+    "$schema": "error_collector_mcp/config/config_schema.json",
+    "openrouter": {
+        "api_key": "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"
+    }
+}

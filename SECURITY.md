@@ -2,101 +2,167 @@
 
 ## Supported Versions
 
-We actively support the following versions of Error Collector MCP with security updates:
+We actively support the following versions with security updates:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.1.x   | :white_check_mark: |
+| 1.x.x   | :white_check_mark: |
+| 0.x.x   | :x:                |
 
 ## Reporting a Vulnerability
 
-We take security vulnerabilities seriously. If you discover a security vulnerability in Error Collector MCP, please report it responsibly.
+We take security vulnerabilities seriously. If you discover a security
+vulnerability in Error Collector MCP, please report it responsibly.
 
 ### How to Report
 
-1. **Do NOT create a public GitHub issue** for security vulnerabilities
-2. **Email us directly** at: [security@yourdomain.com] (replace with actual email)
-3. **Include the following information**:
-   - Description of the vulnerability
-   - Steps to reproduce the issue
-   - Potential impact
-   - Any suggested fixes (if you have them)
+**Please do NOT report security vulnerabilities through public GitHub issues.**
 
-### What to Expect
+Instead, please report them via one of the following methods:
 
-- **Acknowledgment**: We'll acknowledge receipt of your report within 48 hours
-- **Initial Assessment**: We'll provide an initial assessment within 5 business days
-- **Updates**: We'll keep you informed of our progress
-- **Resolution**: We aim to resolve critical vulnerabilities within 30 days
-- **Credit**: We'll credit you in our security advisories (unless you prefer to remain anonymous)
+1. **Email**: Send details to security@error-collector-mcp.org
+2. **GitHub Security Advisory**: Use GitHub's private vulnerability reporting
+   feature
+3. **Encrypted Communication**: Use our PGP key for sensitive reports
 
-### Security Best Practices
+### What to Include
 
-When using Error Collector MCP:
+When reporting a vulnerability, please include:
 
-#### Configuration Security
-- **Never commit API keys** to version control
-- **Use environment variables** for sensitive configuration
-- **Restrict file permissions** on configuration files (600 or 640)
-- **Regularly rotate API keys**
+- Description of the vulnerability
+- Steps to reproduce the issue
+- Potential impact assessment
+- Suggested fix (if available)
+- Your contact information
 
-#### Network Security
-- **Use HTTPS** when possible for API communications
-- **Configure firewalls** to restrict access to MCP server ports
-- **Monitor network traffic** for unusual patterns
+### Response Timeline
 
-#### Data Privacy
-- **Review error filtering** to prevent sensitive data collection
-- **Configure data retention** policies appropriately
-- **Understand data flow** to external services (OpenRouter)
+- **Initial Response**: Within 24 hours
+- **Vulnerability Assessment**: Within 72 hours
+- **Fix Development**: Within 7-14 days (depending on severity)
+- **Public Disclosure**: After fix is released and users have time to update
 
-#### Access Control
-- **Limit MCP server access** to authorized AI assistants only
-- **Use principle of least privilege** for file system access
-- **Monitor server logs** for unauthorized access attempts
+## Security Best Practices
 
-### Known Security Considerations
+### For Users
 
-#### Data Handling
+1. **API Key Security**:
+   - Never commit API keys to version control
+   - Use environment variables or secure secret management
+   - Rotate API keys regularly
+   - Use least-privilege API keys when possible
+
+2. **Network Security**:
+   - Run the server behind a firewall
+   - Use HTTPS in production environments
+   - Limit network access to necessary ports only
+   - Consider using VPN for remote access
+
+3. **Data Protection**:
+   - Regularly backup error data
+   - Implement data retention policies
+   - Consider data encryption at rest
+   - Monitor access logs
+
+4. **System Security**:
+   - Keep dependencies updated
+   - Run with minimal required privileges
+   - Use container security best practices
+   - Monitor system resources
+
+### For Developers
+
+1. **Code Security**:
+   - Follow secure coding practices
+   - Validate all inputs
+   - Sanitize error messages before AI processing
+   - Use parameterized queries for data access
+
+2. **Dependency Management**:
+   - Regularly audit dependencies for vulnerabilities
+   - Use dependency scanning tools
+   - Pin dependency versions in production
+   - Monitor security advisories
+
+3. **Testing**:
+   - Include security tests in CI/CD
+   - Test with malformed inputs
+   - Validate error handling paths
+   - Test rate limiting and resource exhaustion
+
+## Known Security Considerations
+
+### Data Sensitivity
+
 - Error messages may contain sensitive information
-- Configure appropriate filtering to exclude sensitive data
-- Be aware that error data is sent to OpenRouter for AI analysis
+- Stack traces can reveal internal system details
+- File paths may expose system structure
+- Environment variables might contain secrets
 
-#### Network Communications
-- MCP server listens on localhost by default
-- Browser extension communicates with local server
-- API calls to OpenRouter are made over HTTPS
+**Mitigation**: The system includes built-in filtering to remove common
+sensitive patterns, but users should review their error patterns and configure
+additional filtering as needed.
 
-#### File System Access
-- Server requires read/write access to configured data directory
-- Shell integration may execute commands with user privileges
-- Browser extension has limited permissions within browser context
+### API Key Exposure
 
-### Security Updates
+- OpenRouter API keys provide access to AI services
+- Exposed keys can lead to unauthorized usage and costs
+- Keys in logs or error messages create security risks
 
-Security updates will be:
-- **Released promptly** for critical vulnerabilities
-- **Documented** in CHANGELOG.md with security labels
-- **Announced** through GitHub security advisories
-- **Tagged** with appropriate version numbers
+**Mitigation**: Use environment variables, never log API keys, and implement
+proper secret management practices.
 
-### Vulnerability Disclosure Timeline
+### Network Exposure
 
-1. **Day 0**: Vulnerability reported
-2. **Day 1-2**: Acknowledgment sent
-3. **Day 3-7**: Initial assessment and triage
-4. **Day 8-30**: Development and testing of fix
-5. **Day 30**: Public disclosure and release (may be extended for complex issues)
+- MCP server listens on network ports
+- Browser extensions communicate over HTTP/WebSocket
+- Unprotected endpoints can be accessed by malicious actors
 
-### Bug Bounty
+**Mitigation**: Use proper firewall configuration, consider HTTPS/WSS in
+production, and implement authentication if needed.
 
-We currently do not offer a formal bug bounty program, but we greatly appreciate security researchers who help improve our security posture.
+## Security Updates
 
-### Contact
+Security updates are released as patch versions and are clearly marked in the
+changelog. Users are strongly encouraged to:
+
+1. Subscribe to security notifications
+2. Update promptly when security patches are released
+3. Test updates in staging environments first
+4. Monitor security advisories
+
+## Compliance
+
+This project aims to comply with:
+
+- **OWASP Top 10** security practices
+- **CWE/SANS Top 25** vulnerability prevention
+- **NIST Cybersecurity Framework** guidelines
+- **ISO 27001** security management principles
+
+## Security Tools
+
+We use the following tools to maintain security:
+
+- **Bandit**: Python security linter
+- **Safety**: Dependency vulnerability scanner
+- **CodeQL**: Semantic code analysis
+- **Dependabot**: Automated dependency updates
+- **SAST**: Static Application Security Testing
+
+## Contact
 
 For security-related questions or concerns:
-- **Security Email**: [security@yourdomain.com]
-- **General Issues**: [GitHub Issues](https://github.com/yourusername/error-collector-mcp/issues)
-- **General Questions**: [GitHub Discussions](https://github.com/yourusername/error-collector-mcp/discussions)
 
-Thank you for helping keep Error Collector MCP secure!
+- **Security Team**: security@error-collector-mcp.org
+- **General Contact**: maintainers@error-collector-mcp.org
+- **GitHub**: Use private vulnerability reporting
+
+## Acknowledgments
+
+We appreciate the security research community and will acknowledge researchers
+who responsibly disclose vulnerabilities (with their permission).
+
+---
+
+**Last Updated**: February 2025 **Next Review**: May 2025

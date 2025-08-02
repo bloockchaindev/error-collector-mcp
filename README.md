@@ -26,29 +26,46 @@ generate summaries for AI agents like Kiro.
   privacy settings
 - **Open Source**: MIT licensed and fully customizable
 
-## Quick Start
+## 🚀 Quick Start
 
-1. **Install the package**:
-   ```bash
-   pip install -e .
-   ```
+### Option 1: Interactive Setup Script (Recommended)
 
-2. **Create configuration**:
-   ```bash
-   # For full configuration with all options:
-   cp config.example.json config.json
+```bash
+# Run the interactive setup script
+./setup.sh
 
-   # Or for minimal setup:
-   cp config.minimal.json config.json
+# Or on Windows
+setup.bat
 
-   # Edit config.json with your OpenRouter API key
-   # Get your free API key from: https://openrouter.ai/
-   ```
+# Or directly with Python
+python3 setup.py
+```
 
-3. **Run the MCP server**:
-   ```bash
-   error-collector-mcp
-   ```
+The setup script will:
+
+- ✅ Check system requirements
+- ✅ Install the package
+- ✅ Configure environment variables
+- ✅ Set up integrations (Kiro, browser, terminal)
+- ✅ Test the installation
+- ✅ Start the server
+
+### Option 2: Manual Setup
+
+```bash
+# 1. Install
+pip install error-collector-mcp
+
+# 2. Configure
+cp .env.example .env
+# Add your OpenRouter API key to .env
+
+# 3. Run
+error-collector-mcp serve
+```
+
+📖 **Detailed Setup**: See [SETUP.md](SETUP.md) for complete installation and
+configuration instructions.
 
 4. **Install shell integration** (optional):
    ```bash

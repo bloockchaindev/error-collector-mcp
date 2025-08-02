@@ -2,17 +2,23 @@ version: '3.8'
 
 services:
   error-collector-mcp:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-$(date -u +'%Y-%m-%dT%H:%M:%SZ')}
+        VERSION: ${VERSION:-1.0.0}
+        VCS_REF: ${VCS_REF:-$(git rev-parse --short HEAD)}
     container_name: error-collector-mcp
     ports:
       - "8000:8000"
-    volumes:
-      - ./config.json:/app/config.json:ro
-      - error_data:/data
     environment:
-      - ERROR_COLLECTOR_STORAGE__DATA_DIRECTORY=/data
-      - ERROR_COLLECTOR_SERVER__HOST=0.0.0.0
-      - ERROR_COLLECTOR_SERVER__PORT=8000
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - ERROR_COLLECTOR_DATA_DIR=/data
+      - ERROR_COLLECTOR_CONFIG=/app/config.json
+    volumes:
+      - error_data:/data
+      - ./config.production.json:/app/config.json:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -20,7 +26,51 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Monitoring with Prometheus (uncomment if needed)
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #     - prometheus_data:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--web.console.libraries=/etc/prometheus/console_libraries'
+  #     - '--web.console.templates=/etc/prometheus/consoles'
+  #     - '--web.enable-lifecycle'
+  #   restart: unless-stopped
+
+  # Optional: Grafana for visualization (uncomment if needed)
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #     - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+  #     - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+  #   restart: unless-stopped
 
 volumes:
   error_data:
     driver: local
+  # prometheus_data:
+  #   driver: local
+  # grafana_data:
+  #   driver: local
+
+networks:
+  default:
+    name: error-collector-network

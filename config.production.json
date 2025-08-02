@@ -1,0 +1,61 @@
+{
+    "$schema": "./error_collector_mcp/config/config_schema.json",
+    "_comment": "Production Configuration for Error Collector MCP",
+    "_description": "Optimized configuration for production deployment with security and performance considerations",
+
+    "openrouter": {
+        "_comment": "OpenRouter API configuration - API key should be set via environment variable",
+        "api_key": "${OPENROUTER_API_KEY}",
+        "base_url": "https://openrouter.ai/api/v1",
+        "model": "qwen/qwen-2.5-coder-32b-instruct:free",
+        "max_tokens": 2000,
+        "temperature": 0.3,
+        "timeout": 45,
+        "max_retries": 5
+    },
+
+    "collection": {
+        "_comment": "Production error collection settings with enhanced filtering",
+        "enabled_sources": ["browser", "terminal"],
+        "ignored_error_patterns": [
+            "ResizeObserver loop limit exceeded",
+            "Non-Error promise rejection captured",
+            "Script error\\.",
+            "Network request failed.*chrome-extension",
+            "Loading chunk \\d+ failed",
+            "ChunkLoadError",
+            "Loading CSS chunk \\d+ failed",
+            "Failed to fetch dynamically imported module"
+        ],
+        "ignored_domains": [
+            "chrome-extension://",
+            "moz-extension://",
+            "safari-extension://",
+            "localhost:3000",
+            "localhost:3001",
+            "127.0.0.1",
+            "0.0.0.0"
+        ],
+        "max_errors_per_minute": 500,
+        "auto_summarize": true,
+        "group_similar_errors": true,
+        "similarity_threshold": 0.85
+    },
+
+    "storage": {
+        "_comment": "Production storage configuration with extended retention",
+        "data_directory": "${ERROR_COLLECTOR_DATA_DIR:-~/.error-collector-mcp}",
+        "max_errors_stored": 100000,
+        "retention_days": 90,
+        "backup_enabled": true
+    },
+
+    "server": {
+        "_comment": "Production server configuration with enhanced performance",
+        "host": "0.0.0.0",
+        "port": 8000,
+        "log_level": "INFO",
+        "enable_cors": true,
+        "max_concurrent_requests": 50
+    }
+}
